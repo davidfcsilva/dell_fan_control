@@ -1,0 +1,26 @@
+[Unit]
+Description=Dell Fan Control Daemon
+Documentation=man:systemd-service(5)
+After=network.target
+Wants=dell_fan_control.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /opt/dell_fan_control.py --daemon
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dell-fan-control
+PIDFile=/var/run/dell_fan_control.pid
+
+# Security hardening
+ProtectSystem=strict
+ReadWritePaths=/sys /var/log /var/run
+NoNewPrivileges=no
+ProtectHome=yes
+ProtectKernelTunables=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

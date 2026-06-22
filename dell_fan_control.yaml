@@ -1,0 +1,46 @@
+# dell_fan_control.yaml — Sample configuration for Dell Fan Control Daemon
+# Place at /etc/dell-fan-control.yaml and run with --config /etc/dell-fan-control.yaml
+
+# Temperature sensors to monitor (repeatable list)
+#   temp1  = Ambient
+#   temp2  = CPU
+#   nvme0  = NVMe Drive 0
+#   nvme1  = NVMe Drive 1
+#   Or any /sys/.../temp*_input path
+sensors:
+  - name: temp2
+    label: CPU
+    weight: 1.0
+
+# Optional: blend multiple sensors
+# sensors:
+#   - name: temp1
+#     label: Ambient
+#     weight: 0.3
+#   - name: temp2
+#     label: CPU
+#     weight: 1.0
+#   - name: nvme0
+#     label: NVMe0 SSD
+#     weight: 0.5
+
+# Fan curve parameters
+curve:
+  idle_temp: 30        # °C below which idle PWM applies
+  target_temp: 60      # °C at which target PWM is reached
+  critical_temp: 85    # °C above which fans go to max (255)
+  pwm_idle: 64         # PWM at idle (~25%)
+  pwm_target: 192      # PWM at target (~75%)
+
+# Fans to control
+fans:
+  - name: fan1         # Processor Fan
+    enabled: true
+  - name: fan2         # Motherboard Fan
+    enabled: true
+
+# Polling interval in seconds
+interval: 10
+
+# Log file
+log_file: /var/log/dell_fan_control.log
