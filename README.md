@@ -154,6 +154,24 @@ interval: 10
 log_file: /var/log/dell_fan_control.log
 ```
 
+## Log Rotation
+
+Create `/etc/logrotate.d/dell_fan_control` to keep log files from growing indefinitely:
+
+```
+/var/log/dell_fan_control.log {
+    rotate 7
+    daily
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 660 root root
+}
+```
+
+This rotates the log daily, keeps 7 days of history, and compresses old rotations. The current log file is never compressed (`delaycompress`) so the daemon can continue writing to it seamlessly.
+
 ## Safety
 
 - **Root required** — the script checks `os.geteuid() != 0` and refuses to run without privileges (unless `--dry-run`).
