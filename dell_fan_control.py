@@ -199,6 +199,17 @@ class DellFanController:
                         "Enable path %s not found — fan may already be in manual mode or path differs",
                         fc.enable_path,
                 )
+            except OSError:
+                # pwmN_enable is write-only on some hwmon drivers (e.g. Dell SMM) —
+                # we can't read the current value, so just set it to manual.
+                logging.warning(
+                    "%s is not readable — setting to manual mode anyway",
+                    fc.enable_path.name,
+                )
+                try:
+                    self.write_file(fc.enable_path, "1")
+                except OSError as e:
+                    logging.error("Could not set %s to manual mode: %s", fc.enable_path.name, e)
 
     def restore_auto_mode(self, fan_configs: list[FanConfig]):
         """Restore PWM enable mode to auto (2) for each fan on shutdown."""
