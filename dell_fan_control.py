@@ -310,22 +310,25 @@ def discover_sensors():
 
     # Fan info
     print("\nFans:")
-    for fan_idx in (1, 2):
+    def _try_read(path, default="<unreadable>"):
+        """Read a sysfs file, returning default on any error (write-only, permission, etc.)."""
         try:
-            label = ctrl.read_file(Path(HWMON4) / f"fan{fan_idx}_label") or f"Fan {fan_idx}"
-            rpm = ctrl.read_file(Path(HWMON4) / f"fan{fan_idx}_input")
-            mode = ctrl.read_file(Path(HWMON4) / f"pwm{fan_idx}_enable")
-            # pwmN is write-only on many hwmon drivers — try reading, but don't fail
-            try:
-                pwm = ctrl.read_file(Path(HWMON4) / f"pwm{fan_idx}")
-                pwm_str = f"  PWM={pwm}/255"
-            except Exception:
-                pwm_str = ""
-            print(f"  pwm{fan_idx}: {label:<16} RPM={rpm}{pwm_str}  mode={mode}")
-        except FileNotFoundError:
-            print(f"  pwm{fan_idx}: NOT FOUND")
-        except Exception as e:
-            print(f"  pwm{fan_idx}: ERROR: {e}")
+            return ctrl.read_file(path)
+        except Exception:
+            return default
+
+    base = Path(HWMON4)
+    for fan_idx in (1, 2):
+        label   = _try_read(base / f"fan{fan_idx}_label", default=f"Fan {fan_idx}")
+        rpm     = _try_read(base / f"fan{fan_idx}_input")
+        mode    = _try_read(base / f"pwm{fan_idx}_enable")
+        # pwmN is write-only on many hwmon drivers — try reading, but don't fail
+        pwm     = _try_read(base / f"pwm{fan_idx}", default="<write-only>")
+        if pwm != "<write-only>":
+            pwm_str = f"  PWM={pwm}/255"
+        else:
+            pwm_str = "  (PWM write-only)"
+        print(f"  pwm{fan_idx}: {label:<16} RPM={rpm}{pwm_str}  mode={mode}")
 
 
 # ---------------------------------------------------------------------------
