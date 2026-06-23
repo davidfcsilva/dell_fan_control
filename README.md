@@ -105,10 +105,10 @@ The fan curve is a piecewise linear mapping from temperature to PWM duty cycle:
 PWM
 255 |                                    ██████████ critical
     |                                ███
- 192 |                          ███  target (~75%)
+192 |                          ███  target (~75%)
     |                      ███
     |                  ███
-  64 |            ███  idle (~25%)
+ 64 |            ███  idle (~25%)
     |        ███
       +----|-----|---------|----------------→ °C
          idle  target   critical
